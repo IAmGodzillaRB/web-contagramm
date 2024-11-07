@@ -1,50 +1,68 @@
-// Función para verificar al empleado
-function checkEmployee() {
-    const identificador = document.getElementById('name').value;
-  
-    // Validar que el campo no esté vacío
-    if (!identificador) {
-      alert("Por favor ingrese un nombre o número de empleado.");
+document.getElementById('verifyButton').addEventListener('click', async function () {
+    const nameInput = document.getElementById('name').value;
+    const errorMessage = document.getElementById('error-message');
+    const employeeDetails = document.getElementById('employeeDetails');
+
+    // Validación del campo de entrada
+    if (!nameInput) {
+      errorMessage.classList.remove('hidden');
+      errorMessage.textContent = 'Por favor, complete este campo.';
       return;
+    } else {
+      errorMessage.classList.add('hidden');
     }
-  
-    // Hacer la solicitud al backend para verificar el empleado
-    fetch('http://localhost:3000/verificarEmpleado', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ identificador: identificador })
-    })
-    .then(response => response.json())
-    .then(data => {
+
+    // Envío de solicitud al servidor
+    try {
+      const response = await fetch('http://localhost:3000/verificarEmpleado', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identificador: nameInput })
+      });
+
+      const data = await response.json();
+
+      // Mostrar resultados o mensaje de error
+      employeeDetails.classList.remove('hidden');
       if (data.nombre) {
-        // Mostrar los detalles del empleado en el modal
-        const modal = document.getElementById('modal');
-        const employeeDetails = document.getElementById('employeeDetails');
-        
         employeeDetails.innerHTML = `
-          <strong>Nombre:</strong> ${data.nombre}<br>
-          <strong>Numero de Empleado:</strong> ${data.numeroEmpleado}<br>
-          <strong>Puesto:</strong> ${data.puesto}<br>
-          <strong>Activo:</strong> ${data.activo}
+          <p>Nombre: ${data.nombre}</p>
+          <p>Número de empleado: ${data.numeroEmpleado}</p>
+          <p>Puesto: ${data.puesto}</p>
+          <p>Activo: ${data.estado}</p>
         `;
-        modal.classList.remove('hidden'); // Mostrar el modal
       } else {
-        alert('Empleado no encontrado');
+        employeeDetails.innerHTML = `<p>${data.mensaje}</p>`;
       }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Hubo un problema con la verificación.');
+    } catch (error) {
+      employeeDetails.classList.remove('hidden');
+      employeeDetails.textContent = 'Error al conectar con el servidor.';
+    }
+  });
+
+  app.post('/verificarEmpleado', (req, res) => {
+    const { identificador } = req.body;
+    const consulta = 'SELECT * FROM base2024 WHERE NumeroEmpleado = ? OR Nombre = ?';
+  
+    conexion.query(consulta, [identificador, identificador], (error, resultados) => {
+      if (error) {
+        console.error('Error en la consulta:', error);
+        res.status(500).json({ error: 'Error en la consulta de la base de datos' });
+      } else if (resultados.length > 0) {
+        res.json({
+          nombre: resultados[0].Nombre,
+          numeroEmpleado: resultados[0].NumeroEmpleado,
+          puesto: resultados[0].Puesto,
+          estado: resultados[0].Estado ? 'Sí' : 'No'
+        });
+      } else {
+        res.json({ mensaje: 'No se encontró ningún empleado con ese identificador.' });
+      }
     });
-  }
+  });
   
-  // Asignar la función al botón
-  document.getElementById('verifyButton').addEventListener('click', checkEmployee);
-  
-  // Función para cerrar el modal
-  document.getElementById('closeModal').addEventListener('click', () => {
-    document.getElementById('modal').classList.add('hidden');
+  // Iniciar el servidor
+  app.listen(PORT, () => {
+    console.log(`Servidor corriendo en http://localhost:${PORT}`);
   });
   
