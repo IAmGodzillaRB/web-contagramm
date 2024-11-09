@@ -1,0 +1,31 @@
+<div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+  <h1 class="text-2xl font-semibold text-center mb-6">Subir y Visualizar CSV</h1>
+
+  <!-- Área para subir el archivo CSV -->
+  <div class="mb-4">
+    <label for="csv-file" class="block text-lg font-medium text-gray-700">Selecciona un archivo CSV</label>
+    <input type="file" id="csv-file" accept=".csv" class="mt-2 p-2 w-full border border-gray-300 rounded-md" />
+  </div>
+
+  <!-- Tabla para mostrar los datos CSV -->
+  <div id="csv-table" class="hidden">
+    <h2 class="text-xl font-semibold mb-4">Datos Cargados</h2>
+    <table class="min-w-full border-collapse table-auto border border-gray-300">
+      <thead>
+        <tr id="table-header">
+          <!-- Encabezados dinámicos generados -->
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <!-- Filas de la tabla se llenarán aquí -->
+      </tbody>
+    </table>
+    <!-- Paginación -->
+    <div class="pagination flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+      <button id="prev-btn" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50">Previous</button>
+      <button id="next-btn" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50">Next</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="/src/components/TS/updateCSV.js"></script> <!-- Asegúrate de que la ruta sea correcta -->
